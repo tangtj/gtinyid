@@ -13,3 +13,11 @@ func RetOk(data interface{}) *Ret {
 		Data: data,
 	}
 }
+
+func RetErr(code, msg string, data interface{}) *Ret {
+	return &Ret{
+		Code: code,
+		Msg:  msg,
+		Data: data,
+	}
+}
