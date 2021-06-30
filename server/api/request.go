@@ -14,9 +14,7 @@ var generator service.IdGenService = service.NewMemoryGenerator()
 var tokenService = service.NewIdTokenService()
 
 func BatchNext(writer http.ResponseWriter, request *http.Request) {
-	if ok := canGenerate(getAuth(request)); !ok {
-		resp, _ := json.Marshal(model.RetErr("403", "token异常", nil))
-		writer.Write(resp)
+	if !checkAuth(request, writer) {
 		return
 	}
 	size := 20
@@ -33,9 +31,7 @@ func BatchNext(writer http.ResponseWriter, request *http.Request) {
 }
 
 func Next(writer http.ResponseWriter, request *http.Request) {
-	if ok := canGenerate(getAuth(request)); !ok {
-		resp, _ := json.Marshal(model.RetErr("403", "token异常", nil))
-		writer.Write(resp)
+	if !checkAuth(request, writer) {
 		return
 	}
 	ret, _ := generator.Next()
@@ -43,10 +39,11 @@ func Next(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(resp)
 }
 
-func canGenerate(biz, token string) bool {
-	return tokenService.CanGenerate(biz, token)
-}
-
-func getAuth(request *http.Request) (string, string) {
-	return request.Header.Get("biz_type"), request.Header.Get("token")
+func checkAuth(request *http.Request, writer http.ResponseWriter) bool {
+	if !tokenService.CanGenerate(request.Header.Get("biz_type"), request.Header.Get("token")) {
+		resp, _ := json.Marshal(model.RetErr("403", "token异常", nil))
+		writer.Write(resp)
+		return false
+	}
+	return true
 }
