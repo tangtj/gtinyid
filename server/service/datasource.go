@@ -9,23 +9,22 @@ import (
 var _ IdGenerator = (*SegmentIdGenerator)(nil)
 
 type SegmentIdGenerator struct {
-	BizType string
+	bizType string
 
 	segment     *model.SegmentId
 	nextSegment *model.SegmentId
-	currentId   int64
 
 	locker sync.Mutex
 }
 
 func NewSegmentIdGenerator(bizType string) IdGenerator {
-	g := &SegmentIdGenerator{BizType: bizType}
+	g := &SegmentIdGenerator{bizType: bizType}
 	g._init()
 	return g
 }
 
-func (g *SegmentIdGenerator) _init() {
-	g._loadCurr()
+func (d *SegmentIdGenerator) _init() {
+	d._loadCurr()
 }
 
 func (d *SegmentIdGenerator) Next() (int64, error) {
@@ -65,7 +64,7 @@ func (d *SegmentIdGenerator) _loadNext() error {
 
 		if d.nextSegment == nil {
 
-			s, err := dao.GetNextSegment(d.BizType)
+			s, err := dao.GetNextSegment(d.bizType)
 			if err == nil {
 				d.nextSegment = s
 			} else {
@@ -81,24 +80,18 @@ func (d *SegmentIdGenerator) _loadCurr() error {
 
 	//当前 号段为空 || 号段已使用完
 	if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
-		//备用号段没了
-		if d.nextSegment != nil {
-			//上锁之后再check一次
-			defer d.locker.Unlock()
-			d.locker.Lock()
 
-			if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
-				d.segment = d.nextSegment
-				d.nextSegment = nil
-			}
-		} else {
-			defer d.locker.Unlock()
-			d.locker.Lock()
+		defer d.locker.Unlock()
+		d.locker.Lock()
 
-			if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
+		//double check
+		if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
 
-				s, err := dao.GetNextSegment(d.BizType)
-				if err == nil {
+			// 备用号段还有
+			if d.nextSegment != nil {
+				d.segment, d.nextSegment = d.nextSegment, nil
+			} else {
+				if s, err := dao.GetNextSegment(d.bizType); err == nil {
 					d.segment = s
 				} else {
 					return err
