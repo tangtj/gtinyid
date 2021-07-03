@@ -1,18 +1,17 @@
--- auto-generated definition
+# 业务方信息
 create table id_token
 (
     id       int auto_increment
         primary key,
     biz_type varchar(36)             not null,
-    remake   varchar(100) default '' not null,
+    remake   varchar(100) default '' not null comment '备注',
     token    varchar(128)            not null,
     constraint unique_biz_key
         unique (biz_type)
 );
 
 
-
--- auto-generated definition
+# 业务方id号段信息
 create table id_info
 (
     id       int auto_increment
