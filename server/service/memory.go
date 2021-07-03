@@ -5,14 +5,14 @@ import (
 	"sync/atomic"
 )
 
-var _ IdGenService = (*MemoryIdGenerator)(nil)
+var _ IdGenerator = (*MemoryIdGenerator)(nil)
 
 type MemoryIdGenerator struct {
 	lastId int64
 	locker sync.Locker
 }
 
-func NewMemoryGenerator() IdGenService {
+func NewMemoryGenerator() IdGenerator {
 	return &MemoryIdGenerator{
 		lastId: 0,
 		locker: &sync.Mutex{},
