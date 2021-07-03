@@ -37,11 +37,12 @@ func GetNextSegment(bizType string) (*model.SegmentId, error) {
 	}
 	s := &model.SegmentId{}
 	ver := 0
-	if err := row.Scan(&s.BizType, s.MaxId, s.Step, s.Incr, &ver); err != nil {
+	if err := row.Scan(&s.BizType, &s.MaxId, &s.Step, &s.Incr, &ver); err != nil {
 		log.Printf("查询号段信息异常 : %s", err)
 	}
-	nextMax := s.MaxId + int64(s.Step)
-	s.MaxId = nextMax
+	s.CurrentId = s.MaxId
+	s.StartId = s.MaxId
+	s.MaxId = s.StartId + s.Step
 
 	result, err := tx.Exec(updateSegmentInfo, bizType, ver)
 	if err != nil {

@@ -17,19 +17,27 @@ const LoadingRatio = 70
 type SegmentId struct {
 	BizType   string
 	CurrentId int64
+	StartId   int64
 	MaxId     int64
-	Step      int32
-	Incr      int32
+	Step      int64
+	Incr      int64
+	status    SegmentStatus
 }
 
 func (i *SegmentId) Next() (int64, SegmentStatus) {
-	ret := atomic.AddInt64(&i.CurrentId, i.MaxId)
+	ret := atomic.AddInt64(&i.CurrentId, i.Incr)
 	if ret > i.MaxId {
-		return -1, SegmentStatusOver
+		i.status = SegmentStatusOver
+		return -1, i.status
 	}
-	threshold := (i.Step * LoadingRatio) / 100
-	if ret > int64(threshold) {
-		return ret, SegmentStatusLoading
+	threshold := i.StartId + (i.Step*LoadingRatio)/100
+	if ret > threshold {
+		i.status = SegmentStatusLoading
+		return ret, i.status
 	}
-	return ret, SegmentStatusNormal
+	return ret, i.status
+}
+
+func (i *SegmentId) Status() SegmentStatus {
+	return i.status
 }

@@ -9,14 +9,16 @@ import (
 	"strconv"
 )
 
-var generator service.IdGenService = service.NewMemoryGenerator()
+var generator = service.NewIdGeneratorFactory()
 
 var tokenService = service.NewIdTokenService()
 
 func BatchNext(writer http.ResponseWriter, request *http.Request) {
+
 	if !checkAuth(request, writer) {
 		return
 	}
+	bizType := request.Header.Get("biz_type")
 	size := 20
 	if sizeStr := request.FormValue("size"); len(sizeStr) > 0 {
 		if i, err := strconv.Atoi(sizeStr); err != nil {
@@ -25,7 +27,7 @@ func BatchNext(writer http.ResponseWriter, request *http.Request) {
 			size = i
 		}
 	}
-	ret, _ := generator.BatchNext(size)
+	ret, _ := generator.BatchNext(bizType, size)
 	resp, _ := json.Marshal(model.RetOk(ret))
 	writer.Write(resp)
 }
@@ -34,7 +36,8 @@ func Next(writer http.ResponseWriter, request *http.Request) {
 	if !checkAuth(request, writer) {
 		return
 	}
-	ret, _ := generator.Next()
+	bizType := request.Header.Get("biz_type")
+	ret, _ := generator.Next(bizType)
 	resp, _ := json.Marshal(model.RetOk(ret))
 	writer.Write(resp)
 }
