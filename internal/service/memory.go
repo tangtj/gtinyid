@@ -1,18 +1,19 @@
 package service
 
 import (
+	"github.com/tangtj/gtinyid/base"
 	"sync"
 	"sync/atomic"
 )
 
-var _ IdGenerator = (*MemoryIdGenerator)(nil)
+var _ base.IdGenerator = (*MemoryIdGenerator)(nil)
 
 type MemoryIdGenerator struct {
 	lastId int64
 	locker sync.Locker
 }
 
-func NewMemoryGenerator() IdGenerator {
+func NewMemoryGenerator() base.IdGenerator {
 	return &MemoryIdGenerator{
 		lastId: 0,
 		locker: &sync.Mutex{},
