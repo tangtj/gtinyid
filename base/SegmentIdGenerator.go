@@ -1,31 +1,30 @@
-package service
+package base
 
 import (
-	"github.com/tangtj/gtinyid/server/dao"
-	"github.com/tangtj/gtinyid/server/model"
 	"sync"
 )
 
 var _ IdGenerator = (*SegmentIdGenerator)(nil)
 
 type SegmentIdGenerator struct {
-	BizType string
+	bizType string
 
-	segment     *model.SegmentId
-	nextSegment *model.SegmentId
-	currentId   int64
+	segment     *Segment
+	nextSegment *Segment
+
+	segmentService SegmentService
 
 	locker sync.Mutex
 }
 
-func NewSegmentIdGenerator(bizType string) IdGenerator {
-	g := &SegmentIdGenerator{BizType: bizType}
+func NewSegmentIdGenerator(bizType string, segmentService SegmentService) IdGenerator {
+	g := &SegmentIdGenerator{bizType: bizType, segmentService: segmentService}
 	g._init()
 	return g
 }
 
-func (g *SegmentIdGenerator) _init() {
-	g._loadCurr()
+func (d *SegmentIdGenerator) _init() {
+	d._loadCurr()
 }
 
 func (d *SegmentIdGenerator) Next() (int64, error) {
@@ -33,12 +32,12 @@ func (d *SegmentIdGenerator) Next() (int64, error) {
 	for true {
 		id, status := d.segment.Next()
 		switch status {
-		case model.SegmentStatusOver:
+		case SegmentStatusOver:
 			d._loadCurr()
-		case model.SegmentStatusLoading:
+		case SegmentStatusLoading:
 			go d._loadNext()
 			fallthrough
-		case model.SegmentStatusNormal:
+		case SegmentStatusNormal:
 			next = id
 			goto out
 		}
@@ -65,7 +64,7 @@ func (d *SegmentIdGenerator) _loadNext() error {
 
 		if d.nextSegment == nil {
 
-			s, err := dao.GetNextSegment(d.BizType)
+			s, err := d.segmentService.GetSegment(d.bizType)
 			if err == nil {
 				d.nextSegment = s
 			} else {
@@ -80,25 +79,19 @@ func (d *SegmentIdGenerator) _loadNext() error {
 func (d *SegmentIdGenerator) _loadCurr() error {
 
 	//当前 号段为空 || 号段已使用完
-	if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
-		//备用号段没了
-		if d.nextSegment != nil {
-			//上锁之后再check一次
-			defer d.locker.Unlock()
-			d.locker.Lock()
+	if d.segment == nil || d.segment.Status() == SegmentStatusOver {
 
-			if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
-				d.segment = d.nextSegment
-				d.nextSegment = nil
-			}
-		} else {
-			defer d.locker.Unlock()
-			d.locker.Lock()
+		defer d.locker.Unlock()
+		d.locker.Lock()
 
-			if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
+		//double check
+		if d.segment == nil || d.segment.Status() == SegmentStatusOver {
 
-				s, err := dao.GetNextSegment(d.BizType)
-				if err == nil {
+			// 备用号段还有
+			if d.nextSegment != nil {
+				d.segment, d.nextSegment = d.nextSegment, nil
+			} else {
+				if s, err := d.segmentService.GetSegment(d.bizType); err == nil {
 					d.segment = s
 				} else {
 					return err

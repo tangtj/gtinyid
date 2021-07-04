@@ -1,4 +1,4 @@
-package service
+package base
 
 type IdGenerator interface {
 	Next() (int64, error)

@@ -3,7 +3,7 @@ package dao
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/tangtj/gtinyid/server/config"
+	"github.com/tangtj/gtinyid/internal/config"
 	"math/rand"
 	"strconv"
 	"strings"
