@@ -49,8 +49,28 @@ func (i *Segment) Status() SegmentStatus {
 	return i.status
 }
 
-func (i Segment) CurrentId() int64 {
+func (i *Segment) CurrentId() int64 {
 	return i.currentId
+}
+
+func (i *Segment) StartId() int64 {
+	return i.startId
+}
+
+func (i *Segment) MaxId() int64 {
+	return i.maxId
+}
+
+func (i *Segment) Incr() int64 {
+	return i.incr
+}
+
+func (i *Segment) BizType() string {
+	return i.bizType
+}
+
+func (i *Segment) Step() int64 {
+	return i.step
 }
 
 func NewSegment(bizType string, startId, step, incr int64) *Segment {
@@ -63,4 +83,11 @@ func NewSegment(bizType string, startId, step, incr int64) *Segment {
 		incr:      incr,
 		status:    SegmentStatusNormal,
 	}
+}
+
+type SegmentInfo struct {
+	BizType string `json:"biz_type"`
+	StartId int64  `json:"start_id"`
+	Step    int64  `json:"step"`
+	Incr    int64  `json:"incr"`
 }

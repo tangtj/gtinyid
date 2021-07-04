@@ -1,4 +1,4 @@
-package model
+package base
 
 type Ret struct {
 	Code string      `json:"code"`
