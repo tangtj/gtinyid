@@ -25,5 +25,5 @@ go run main
     参考`gtinyid.postman_collection.json`postman导出文件
 
 ## TODO
-- [X] 便于使用的http封装的sdk
+- [X] ~~便于使用的http封装的sdk~~
 - grpc
