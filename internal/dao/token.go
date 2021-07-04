@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/tangtj/gtinyid/server/errorx"
-	"github.com/tangtj/gtinyid/server/model"
+	"github.com/tangtj/gtinyid/base"
+	"github.com/tangtj/gtinyid/internal/model"
 	"log"
 )
 
@@ -15,7 +15,7 @@ func GetAllIdToken() ([]*model.IdToken, error) {
 	rows, err := db.Query(queryToken)
 	if err != nil {
 		log.Print("查询失败")
-		return []*model.IdToken{}, errorx.DBQueryError
+		return []*model.IdToken{}, base.DBQueryError
 	}
 	ret := make([]*model.IdToken, 0)
 	for rows.Next() {

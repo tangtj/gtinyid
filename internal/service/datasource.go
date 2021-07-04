@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/tangtj/gtinyid/server/dao"
-	"github.com/tangtj/gtinyid/server/model"
+	"github.com/tangtj/gtinyid/base"
+	"github.com/tangtj/gtinyid/internal/dao"
 	"sync"
 )
 
@@ -11,8 +11,8 @@ var _ IdGenerator = (*SegmentIdGenerator)(nil)
 type SegmentIdGenerator struct {
 	bizType string
 
-	segment     *model.SegmentId
-	nextSegment *model.SegmentId
+	segment     *base.Segment
+	nextSegment *base.Segment
 
 	locker sync.Mutex
 }
@@ -32,12 +32,12 @@ func (d *SegmentIdGenerator) Next() (int64, error) {
 	for true {
 		id, status := d.segment.Next()
 		switch status {
-		case model.SegmentStatusOver:
+		case base.SegmentStatusOver:
 			d._loadCurr()
-		case model.SegmentStatusLoading:
+		case base.SegmentStatusLoading:
 			go d._loadNext()
 			fallthrough
-		case model.SegmentStatusNormal:
+		case base.SegmentStatusNormal:
 			next = id
 			goto out
 		}
@@ -79,13 +79,13 @@ func (d *SegmentIdGenerator) _loadNext() error {
 func (d *SegmentIdGenerator) _loadCurr() error {
 
 	//当前 号段为空 || 号段已使用完
-	if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
+	if d.segment == nil || d.segment.Status() == base.SegmentStatusOver {
 
 		defer d.locker.Unlock()
 		d.locker.Lock()
 
 		//double check
-		if d.segment == nil || d.segment.Status() == model.SegmentStatusOver {
+		if d.segment == nil || d.segment.Status() == base.SegmentStatusOver {
 
 			// 备用号段还有
 			if d.nextSegment != nil {

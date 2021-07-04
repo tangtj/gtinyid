@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/tangtj/gtinyid/server/model"
-	"github.com/tangtj/gtinyid/server/service"
+	"github.com/tangtj/gtinyid/internal/model"
+	"github.com/tangtj/gtinyid/internal/service"
 	"log"
 	"net/http"
 	"strconv"

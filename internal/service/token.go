@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/tangtj/gtinyid/server/dao"
-	"github.com/tangtj/gtinyid/server/model"
+	"github.com/tangtj/gtinyid/internal/dao"
+	"github.com/tangtj/gtinyid/internal/model"
 	"log"
 	"sync"
 	"time"
