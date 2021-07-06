@@ -1,7 +1,21 @@
 package main
 
-import "github.com/tangtj/gtinyid/internal/api"
+import (
+	"github.com/tangtj/gtinyid/internal/api"
+	"sync"
+)
 
 func main() {
-	api.HttpEnable()
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	go func() {
+		api.HttpEnable(wg)
+	}()
+
+	go func() {
+		api.GrpcEnable(wg)
+	}()
+
+	wg.Wait()
 }
