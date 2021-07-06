@@ -1,10 +1,16 @@
 package api
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+	"sync"
+)
 
-func HttpEnable() {
+func HttpEnable(wg *sync.WaitGroup) {
+	defer wg.Done()
 	http.HandleFunc("/next", Next)
 	http.HandleFunc("/batchNext", BatchNext)
 	http.HandleFunc("/segment", Segment)
-	http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
+	log.Printf("http 服务端口监听异常 : %s", err)
 }

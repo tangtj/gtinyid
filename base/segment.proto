@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package="base/";
+
+package base;
+
+service GrpcSegment{
+  rpc GetSegment(GrpcBizToken)returns (GrpcSegmentInfo);
+}
+
+message GrpcBizToken{
+  string BizType = 1;
+  string Token = 2;
+}
+
+message GrpcSegmentInfo {
+  string BizType = 1;
+  int64 StartId = 2;
+  int64 Step = 3;
+  int64 Incr = 4;
+}
+
+/**
+type SegmentInfo struct {
+	BizType string `json:"biz_type"`
+	StartId int64  `json:"start_id"`
+	Step    int64  `json:"step"`
+	Incr    int64  `json:"incr"`
+}
+ */
