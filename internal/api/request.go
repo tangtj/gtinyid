@@ -59,7 +59,7 @@ func Segment(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	bizType := request.Header.Get("biz_type")
-	if ret, err := segmentService.GetSegment(bizType); err != nil {
+	if ret, err := segmentService.GetBizSegment(bizType); err != nil {
 		resp, _ := json.Marshal(base.RetErr("1", err.Error(), nil))
 		writer.Write(resp)
 	} else {

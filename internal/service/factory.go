@@ -11,8 +11,6 @@ type IdGeneratorFactory struct {
 	locker     sync.Locker
 }
 
-var dbSegmentService base.SegmentService = &segment.DbSegmentService{}
-
 func NewIdGeneratorFactory() *IdGeneratorFactory {
 	return &IdGeneratorFactory{generators: map[string]base.IdGenerator{}, locker: &sync.Mutex{}}
 }
@@ -34,7 +32,7 @@ func (c IdGeneratorFactory) GetGenerator(bizType string) base.IdGenerator {
 	if ok {
 		return gen
 	}
-	gen = base.NewSegmentIdGenerator(bizType, dbSegmentService)
+	gen = base.NewSegmentIdGenerator(bizType, segment.NewDbSegmentService(bizType))
 	c.generators[bizType] = gen
 	return gen
 }

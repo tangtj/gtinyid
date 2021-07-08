@@ -15,10 +15,6 @@ const (
 const LoadingRatio = 70
 
 type SegmentService interface {
-	GetSegment(bizType string) (*Segment, error)
-}
-
-type BizInfoSegmentService interface {
 	GetSegment() (*Segment, error)
 }
 
