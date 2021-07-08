@@ -26,7 +26,7 @@ func (s *GrpcSegmentService) _init() error {
 	return nil
 }
 
-func (s *GrpcSegmentService) GetSegment(bizType string) (*base.Segment, error) {
+func (s *GrpcSegmentService) GetSegment() (*base.Segment, error) {
 	segInfo, err := s.client.GetSegment(context.TODO(), &s.bizInfo)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (s *GrpcSegmentService) GetSegment(bizType string) (*base.Segment, error) {
 	return base.NewSegment(segInfo.BizType, segInfo.StartId, segInfo.Step, segInfo.Incr), nil
 }
 
-func NewGrpcSegmentService(host string, bizType string, token string) base.SegmentService {
+func NewGrpcSegmentService(host string, bizType string, token string) base.BizInfoSegmentService {
 	s := GrpcSegmentService{
 		host: host,
 		bizInfo: base.GrpcBizToken{

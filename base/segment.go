@@ -18,6 +18,10 @@ type SegmentService interface {
 	GetSegment(bizType string) (*Segment, error)
 }
 
+type BizInfoSegmentService interface {
+	GetSegment() (*Segment, error)
+}
+
 type Segment struct {
 	bizType   string
 	currentId int64
