@@ -15,7 +15,7 @@ type HttpSegmentService struct {
 	token   string
 }
 
-func (s *HttpSegmentService) GetSegment(bizType string) (*base.Segment, error) {
+func (s *HttpSegmentService) GetSegment() (*base.Segment, error) {
 	hc := client.R()
 
 	resp, err := hc.SetHeaders(map[string]string{

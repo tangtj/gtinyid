@@ -13,7 +13,7 @@ func (g *GrpcRequest) GetSegment(ctx context.Context, info *base.GrpcBizToken) (
 	if !checkBiz(info) {
 		return nil, errors.New("token异常")
 	}
-	if ret, err := segmentService.GetSegment(info.BizType); err != nil {
+	if ret, err := segmentService.GetBizSegment(info.BizType); err != nil {
 		return nil, err
 	} else {
 		info := &base.GrpcSegmentInfo{

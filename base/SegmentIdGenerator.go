@@ -64,7 +64,7 @@ func (d *SegmentIdGenerator) _loadNext() error {
 
 		if d.nextSegment == nil {
 
-			s, err := d.segmentService.GetSegment(d.bizType)
+			s, err := d.segmentService.GetSegment()
 			if err == nil {
 				d.nextSegment = s
 			} else {
@@ -91,7 +91,7 @@ func (d *SegmentIdGenerator) _loadCurr() error {
 			if d.nextSegment != nil {
 				d.segment, d.nextSegment = d.nextSegment, nil
 			} else {
-				if s, err := d.segmentService.GetSegment(d.bizType); err == nil {
+				if s, err := d.segmentService.GetSegment(); err == nil {
 					d.segment = s
 				} else {
 					return err

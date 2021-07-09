@@ -26,7 +26,7 @@ func (s *GrpcSegmentService) _init() error {
 	return nil
 }
 
-func (s *GrpcSegmentService) GetSegment(bizType string) (*base.Segment, error) {
+func (s *GrpcSegmentService) GetSegment() (*base.Segment, error) {
 	segInfo, err := s.client.GetSegment(context.TODO(), &s.bizInfo)
 	if err != nil {
 		return nil, err
