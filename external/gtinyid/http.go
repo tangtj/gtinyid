@@ -42,6 +42,6 @@ func (s *HttpSegmentService) GetSegment() (*base.Segment, error) {
 
 }
 
-func NewHttpSegmentService(url string, bizType string, token string) base.BizInfoSegmentService {
+func NewHttpSegmentService(url string, bizType string, token string) base.SegmentService {
 	return &HttpSegmentService{url: url, bizType: bizType, token: token}
 }
