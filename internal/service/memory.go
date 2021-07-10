@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/tangtj/gtinyid/base"
-	"sync"
 	"sync/atomic"
 )
 
@@ -10,13 +9,11 @@ var _ base.IdGenerator = (*MemoryIdGenerator)(nil)
 
 type MemoryIdGenerator struct {
 	lastId int64
-	locker sync.Locker
 }
 
 func NewMemoryGenerator() base.IdGenerator {
 	return &MemoryIdGenerator{
 		lastId: 0,
-		locker: &sync.Mutex{},
 	}
 }
 
@@ -27,18 +24,11 @@ func (g *MemoryIdGenerator) Next() (int64, error) {
 func (g *MemoryIdGenerator) BatchNext(size int) ([]int64, error) {
 
 	ret := make([]int64, size)
+	lastNext := atomic.AddInt64(&g.lastId, int64(size))
 
-	g.locker.Lock()
-
-	//直接取出这部分
-	next := g.lastId
-	g.lastId = g.lastId + int64(size)
-
-	g.locker.Unlock()
-
-	for i := 0; i < size; i++ {
-		next = next + 1
-		ret[i] = next
+	for i, n := 0, lastNext-int64(size); i < size; i++ {
+		ret[i] = n
+		n++
 	}
 	return ret, nil
 }
