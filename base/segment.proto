@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package="base/";
+option go_package="base/;base";
 
 package base;
 
@@ -18,6 +18,7 @@ message GrpcSegmentInfo {
   int64 StartId = 2;
   int64 Step = 3;
   int64 Incr = 4;
+  int64 Remainder = 5;
 }
 
 /**

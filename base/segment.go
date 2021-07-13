@@ -73,10 +73,17 @@ func (i *Segment) Step() int64 {
 	return i.step
 }
 
-func NewSegment(bizType string, startId, step, incr int64) *Segment {
+func NewSegment(bizType string, startId, step, incr int64, remainder int64) *Segment {
+	currentId := startId
+	if remainder == 0 {
+		currentId = startId
+	} else {
+		currentId = currentId + incr - step
+	}
+
 	return &Segment{
 		bizType:   bizType,
-		currentId: startId,
+		currentId: currentId,
 		startId:   startId,
 		maxId:     startId + step,
 		step:      step,

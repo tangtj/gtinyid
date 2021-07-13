@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	querySegmentInfo = "select max_id, step, incr,version from id_info where biz_type = ?"
+	querySegmentInfo = "select max_id, step, incr,remainder,version from id_info where biz_type = ?"
 
 	updateSegmentInfo = "update id_info set max_id = max_id + step,version = version + 1 where biz_type = ? and version = ?"
 )
@@ -34,11 +34,11 @@ func GetNextSegment(bizType string) (*base.Segment, error) {
 			return nil, base.DBQueryNotFound
 		}
 	}
-	var maxId, step, incr, ver int64
-	if err := row.Scan(&maxId, &step, &incr, &ver); err != nil {
+	var maxId, step, incr, remainder, ver int64
+	if err := row.Scan(&maxId, &step, &incr, &remainder, &ver); err != nil {
 		log.Printf("查询号段信息异常 : %s", err)
 	}
-	segment := base.NewSegment(bizType, maxId, step, incr)
+	segment := base.NewSegment(bizType, maxId, step, incr, remainder)
 
 	result, err := tx.Exec(updateSegmentInfo, bizType, ver)
 	if err != nil {
